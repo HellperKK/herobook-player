@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box } from "@mui/system";
+import Box from "@mui/system/Box";
+import Button from "@mui/material/Button";
 // import { Button } from '@mui/material';
 
 import styled from "@emotion/styled";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-
-import { useCallback, useState } from "react";
-
-import { Choice, Game, initialGame, initialPage } from "./initialStuff";
+import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import Button from "@mui/material/Button";
+
+import { Choice, Game, initialGame } from "./initialStuff";
+import Stack from "@mui/material/Stack";
 
 const safeMarkdown = (md: string): string => DOMPurify.sanitize(marked(md));
+
 const StyledButton = styled.button`
   color: ${(props) => props.color};
   background-color: transparent;
@@ -25,14 +26,17 @@ const StyledImg = styled.img`
 `;
 
 export default function GameViewer() {
+  const [started, setStarted] = useState(false);
   const [game, setGame] = useState<Game>(initialGame);
   const [id, setId] = useState(1);
-  const [message, setMessage] = useState("not loaded");
+  const [image, setImage] = useState<string | null>(null);
 
   async function loadData() {
     let data = (await invoke("load", {})) as string;
-    setGame(JSON.parse(data));
-    setMessage("loaded");
+    if (data !== "") {
+      setGame(JSON.parse(data));
+    }
+    return JSON.parse(data);
   }
 
   const page = game.pages.find((page) => page.id === id);
@@ -42,17 +46,30 @@ export default function GameViewer() {
     return <p>missing page</p>;
   }
 
-  useCallback(async () => {
-    await loadData();
-  }, []);
-
   const choiceButton = (choice: Choice, index: number) => {
     return (
       <StyledButton
         type="button"
         key={`poll_${index + 42}`}
-        onClick={() => {
+        onClick={async () => {
           setId(choice.pageId);
+          const page = game.pages.find((page) => page.id === choice.pageId);
+
+          if (page == null) {
+            return;
+          }
+
+          if (page.image == "" || page.image == undefined) {
+            setImage(null);
+            return;
+          }
+
+          let data = (await invoke("load_image", {
+            fileName: page.image,
+          })) as string;
+          if (data !== "") {
+            setImage(data);
+          }
         }}
         color={page.format.btnColor ?? game.format.btnColor}
         dangerouslySetInnerHTML={{
@@ -66,7 +83,35 @@ export default function GameViewer() {
     $state: {},
   };
 
-  return (
+  return !started ? (
+    <Stack
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={2}
+    >
+      <Button
+        onClick={async () => {
+          const game: Game = await loadData();
+          setGame(game);
+          const first = game.pages.find((page) => page.isFirst);
+
+          if (first && first.image !== "") {
+            const data = (await invoke("load_image", {
+              fileName: first.image,
+            })) as string;
+            if (data !== "") {
+              setImage(data);
+            }
+          }
+
+          setStarted(true);
+        }}
+      >
+        start game
+      </Button>
+    </Stack>
+  ) : (
     <Box
       sx={{
         padding: "10%",
@@ -75,8 +120,6 @@ export default function GameViewer() {
         overflowX: "auto",
       }}
     >
-      {message}
-      <Button onClick={loadData}>load</Button>
       <Box
         className="story"
         sx={{
@@ -88,7 +131,7 @@ export default function GameViewer() {
         }}
       >
         <div className="story-image">
-          <StyledImg src={page.image} alt="" />
+          {image && <StyledImg src={image} alt="" />}
           {/*
           page.image !== '' ? (
             <img src={assets.images.get(page.image)} alt="" />
