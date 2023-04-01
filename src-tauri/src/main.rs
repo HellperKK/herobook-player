@@ -13,16 +13,13 @@ fn load() -> String {
 #[tauri::command]
 fn load_image(file_name: String) -> String {
     let true_file_name = format!("./assets/images/{}", file_name);
-    let content = fs::read(true_file_name).expect("failed to open image");
-    let base64_content = general_purpose::STANDARD.encode(content);
-    let formated = format!("data:image/png;base64,{}", base64_content);
-    formated
-    /* if let Ok(content) = fs::read_to_string(name) {
-        let base64_content = general_purpose::URL_SAFE_NO_PAD.encode(content);
-        format!("data:image/png;base64, {}", base64_content)
+    if let Ok(content) = fs::read_to_string(true_file_name) {
+        let base64_content = general_purpose::STANDARD.encode(content);
+        let formated = format!("data:image/png;base64,{}", base64_content);
+        formated
     } else {
         "".to_string()
-    } */
+    }
 }
 
 fn main() {
