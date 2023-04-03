@@ -13,11 +13,12 @@ fn load() -> String {
 #[tauri::command]
 fn load_image(file_name: String) -> String {
     let true_file_name = format!("./assets/images/{}", file_name);
-    if let Ok(content) = fs::read_to_string(true_file_name) {
+    if let Ok(content) = fs::read(&true_file_name) {
         let base64_content = general_purpose::STANDARD.encode(content);
         let formated = format!("data:image/png;base64,{}", base64_content);
         formated
     } else {
+        println!("could not open {}", true_file_name);
         "".to_string()
     }
 }
