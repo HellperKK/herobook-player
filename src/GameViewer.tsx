@@ -4,13 +4,15 @@ import Button from "@mui/material/Button";
 // import { Button } from '@mui/material';
 
 import styled from "@emotion/styled";
+import { css } from "@emotion/css";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import { Choice, Game, initialGame } from "./initialStuff";
-import Stack from "@mui/material/Stack";
+
+import "./App.css";
 
 const safeMarkdown = (md: string): string => DOMPurify.sanitize(marked(md));
 
@@ -84,11 +86,13 @@ export default function GameViewer() {
   };
 
   return !started ? (
-    <Stack
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      spacing={2}
+    <div
+      className={css`
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      `}
     >
       <Button
         onClick={async () => {
@@ -110,35 +114,27 @@ export default function GameViewer() {
       >
         start game
       </Button>
-    </Stack>
+    </div>
   ) : (
-    <Box
-      sx={{
-        padding: "10%",
-        minHeight: "60vh",
-        backgroundColor: page.format.background ?? game.format.background,
-        overflowX: "auto",
-      }}
+    <div
+      className={css`
+        height: calc(100vh - 20%);
+        padding: 10%;
+        background-color: ${page.format.background ?? game.format.background};
+      `}
     >
-      <Box
-        className="story"
-        sx={{
-          height: "100%",
-          padding: "8px",
-          textAlign: "center",
-          backgroundColor: page.format.page ?? game.format.page,
-          color: page.format.textColor ?? game.format.textColor,
-        }}
+      <div
+        className={css`
+          background-color: ${page.format.page ?? game.format.page};
+          color: ${page.format.textColor ?? game.format.textColor};
+        `}
       >
-        <div className="story-image">
+        <div
+          className={css`
+            text-align: center;
+          `}
+        >
           {image && <StyledImg src={image} alt="" />}
-          {/*
-          page.image !== '' ? (
-            <img src={assets.images.get(page.image)} alt="" />
-          ) : (
-            <Button variant="outlined">hello</Button>
-          )
-          */}
         </div>
         <p
           className="story-text"
@@ -147,16 +143,15 @@ export default function GameViewer() {
             __html: safeMarkdown(page.text),
           }}
         />
-        <Box
-          className="story"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-          }}
+        <div
+          className={css`
+            display: flex;
+            flex-direction: column;
+          `}
         >
           {page.next.map(choiceButton)}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

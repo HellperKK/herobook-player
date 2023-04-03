@@ -1,7 +1,11 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+body,
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
+#root {
+  height: 100vh;
 }
