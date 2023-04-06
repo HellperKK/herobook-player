@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Box from "@mui/system/Box";
 import Button from "@mui/material/Button";
 // import { Button } from '@mui/material';
 
@@ -141,7 +140,7 @@ export default function GameViewer() {
           className="story-text"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
-            __html: safeMarkdown(page.text),
+            __html: safeMarkdown((window as any).ejs.render(page.text, defs)),
           }}
         />
         <div
