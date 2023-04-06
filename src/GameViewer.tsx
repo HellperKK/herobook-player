@@ -127,6 +127,7 @@ export default function GameViewer() {
         className={css`
           background-color: ${page.format.page ?? game.format.page};
           color: ${page.format.textColor ?? game.format.textColor};
+          padding: 0 4px;
         `}
       >
         <div
