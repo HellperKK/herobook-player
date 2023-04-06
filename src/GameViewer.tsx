@@ -6,10 +6,10 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/css";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 
-import { Choice, Game, initialGame } from "./initialStuff";
+import { Choice, Game, Page, initialGame, initialPage } from "./initialStuff";
 
 import "./App.css";
 
@@ -26,11 +26,21 @@ const StyledImg = styled.img`
   max-width: 80%;
 `;
 
+const defs: any = {
+  $state: {},
+};
+
 export default function GameViewer() {
   const [started, setStarted] = useState(false);
   const [game, setGame] = useState<Game>(initialGame);
   const [id, setId] = useState(1);
   const [image, setImage] = useState<string | null>(null);
+  const page = game.pages.find((page) => page.id === id);
+
+  const content = useMemo(
+    () => (window as any).ejs.render((page ?? initialPage()).text, defs),
+    [page]
+  );
 
   async function loadData() {
     let data = (await invoke("load", {})) as string;
@@ -39,8 +49,6 @@ export default function GameViewer() {
     }
     return JSON.parse(data);
   }
-
-  const page = game.pages.find((page) => page.id === id);
 
   if (page === undefined) {
     alert("non extsitant page");
@@ -80,10 +88,6 @@ export default function GameViewer() {
     );
   };
 
-  const defs: any = {
-    $state: {},
-  };
-
   return !started ? (
     <div
       className={css`
@@ -100,6 +104,7 @@ export default function GameViewer() {
           const first = game.pages.find((page) => page.isFirst);
 
           if (first && first.image !== "") {
+            setId(first.id);
             const data = (await invoke("load_image", {
               fileName: first.image,
             })) as string;
@@ -140,7 +145,7 @@ export default function GameViewer() {
           className="story-text"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
-            __html: safeMarkdown((window as any).ejs.render(page.text, defs)),
+            __html: safeMarkdown(content),
           }}
         />
         <div
