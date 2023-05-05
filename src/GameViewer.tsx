@@ -8,6 +8,7 @@ import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
+import ejs from "ejs";
 
 import { Choice, Game, initialGame, initialPage } from "./initialStuff";
 
@@ -37,10 +38,10 @@ export default function GameViewer() {
   const [image, setImage] = useState<string | null>(null);
   const page = game.pages.find((page) => page.id === id);
 
-  /* const content = useMemo(
+  const content = useMemo(
     () => ejs.render((page ?? initialPage()).text, defs),
     [page]
-  ); */
+  );
 
   async function loadData() {
     let data = (await invoke("load", {})) as string;
@@ -145,7 +146,7 @@ export default function GameViewer() {
           className="story-text"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
-            __html: safeMarkdown(page.text),
+            __html: safeMarkdown(content),
           }}
         />
         <div
