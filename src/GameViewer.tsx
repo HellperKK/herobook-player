@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import ejs from "ejs";
 
-import { Choice, Game, initialGame, initialPage } from "./initialStuff";
+import { Choice, Game, initialGame, initialPage } from "./utils/initialStuff";
 
 import "./App.css";
 import Jinter from "jintr";
@@ -44,7 +44,6 @@ export default function GameViewer() {
     $state: {},
   })
 
-  console.log(defs);
 
   useEffect(() => { }, []);
 
@@ -116,7 +115,6 @@ export default function GameViewer() {
   async function loadSave(id: number) {
     let dataString = (await invoke("load_save", { id })) as string;
     let data: SaveState = JSON.parse(dataString);
-    console.log(data);
     setId(data.pageId);
     setDefs({ $state: data.state });
     setScene("game");

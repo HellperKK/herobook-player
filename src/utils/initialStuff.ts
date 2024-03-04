@@ -1,3 +1,8 @@
+interface SaveState {
+  state: any,
+  pageId: number
+}
+
 interface Choice {
   action: string;
   pageId: number;
@@ -22,6 +27,7 @@ interface Page {
   format: Format;
   image: string;
   category?: string;
+  script?: string;
 }
 
 interface Category {
@@ -29,18 +35,33 @@ interface Category {
   visible: boolean;
 }
 
+interface Texts {
+  play: string;
+  continue: string;
+  quit: string;
+  menu: string;
+}
+
 interface Settings {
   author: string;
   gameTitle: string;
   pageCount: number;
   categories?: Array<Category>;
+  texts?: Texts;
 }
 
 interface Game {
   version: "1.0.0";
   settings: Settings;
-  format: Format;
+  format: Required<Format>;
   pages: Array<Page>;
+}
+
+const initialTexts: Texts = {
+  play: "Play",
+  continue: "Continue",
+  quit: "Quit",
+  menu: "Menu"
 }
 
 const initialChoice = {
@@ -70,7 +91,8 @@ const initialGame: Game = {
   settings: {
     author: "",
     gameTitle: "",
-    pageCount: 2,
+    pageCount: 4,
+    texts: initialTexts,
   },
   format: {
     textColor: "initial",
@@ -80,16 +102,25 @@ const initialGame: Game = {
     background: "#dbfffd",
     page: "#a9e5e2",
   },
+
   pages: [
     {
       id: 1,
       isFirst: true,
       name: "main",
-      text: "This is a first page",
+      text: "What do you want for dessert ?",
       next: [
         {
-          action: "Go to the second page",
+          action: "Cheesecake",
           pageId: 2,
+        },
+        {
+          action: "Vanilla ice cream",
+          pageId: 3,
+        },
+        {
+          action: "Brownie",
+          pageId: 4,
         },
       ],
       format: {},
@@ -97,12 +128,40 @@ const initialGame: Game = {
     },
     {
       id: 2,
-      name: "page2",
+      name: "cheesecake",
       isFirst: false,
-      text: "This is a second page",
+      text: "You chose the best dessert ever and deserve to be my friend!",
       next: [
         {
-          action: "Go to the first page",
+          action: "Choose another dessert",
+          pageId: 1,
+        },
+      ],
+      format: {},
+      image: "",
+    },
+    {
+      id: 3,
+      name: "vanilla",
+      isFirst: false,
+      text: "You are quite classical I must say. But I'm not judging you, not yet.",
+      next: [
+        {
+          action: "Choose another dessert",
+          pageId: 1,
+        },
+      ],
+      format: {},
+      image: "",
+    },
+    {
+      id: 4,
+      name: "brownie",
+      isFirst: false,
+      text: "I would also take that if it wasn't for the calories...",
+      next: [
+        {
+          action: "Choose another dessert",
           pageId: 1,
         },
       ],
@@ -112,5 +171,5 @@ const initialGame: Game = {
   ],
 };
 
-export { initialChoice, initialPage, initialGame, initialCategory };
-export type { Page, Game, Choice, Format, Settings, Category };
+export { initialChoice, initialPage, initialGame, initialCategory, initialTexts };
+export type { Page, Game, Choice, Format, Settings, Category, Texts, SaveState };
