@@ -39,7 +39,7 @@ export default function Player() {
   const audioAsset = assets.musics.find(music => music.name === selectedPage.audio)
   console.log(audioAsset, assets);
   let audio: HTMLAudioElement | null = null;
-  if (audioAsset && ((audioInfo && audioInfo.name !== audioAsset.name) || !audioInfo)) {
+  if (audioAsset && ((audioInfo && audioInfo.name !== audioAsset.name) || !audioInfo || audioInfo.name === "no-music")) {
     if (audioInfo) {
       audioInfo.audio.pause();
     }
@@ -79,6 +79,9 @@ export default function Player() {
           nextPage(choice.pageId);
           if (audio) {
             setAudioInfo({ name: audioAsset!.name, audio })
+          }
+          else if(selectedPage.audio === "no-music") {
+            setAudioInfo({ name: "no-music", audio: new Audio() })
           }
         }}
         color={selectedPage.format.btnColor ?? game.format.btnColor}
