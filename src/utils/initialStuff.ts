@@ -26,6 +26,7 @@ interface Page {
   next: Array<Choice>;
   format: Format;
   image: string;
+  audio?: string;
   category?: string;
   script?: string;
 }
@@ -83,6 +84,7 @@ function initialPage(id = 1): Page {
     next: [initialChoice],
     format: {},
     image: "",
+    audio: "",
   };
 }
 
@@ -125,6 +127,7 @@ const initialGame: Game = {
       ],
       format: {},
       image: "",
+      audio: "",
     },
     {
       id: 2,
@@ -139,6 +142,7 @@ const initialGame: Game = {
       ],
       format: {},
       image: "",
+      audio: "",
     },
     {
       id: 3,
@@ -153,6 +157,7 @@ const initialGame: Game = {
       ],
       format: {},
       image: "",
+      audio: "",
     },
     {
       id: 4,
@@ -167,6 +172,7 @@ const initialGame: Game = {
       ],
       format: {},
       image: "",
+      audio: "",
     },
   ],
 };

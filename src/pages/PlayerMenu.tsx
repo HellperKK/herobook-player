@@ -27,13 +27,21 @@ export default function PlayerMenu() {
 
       let databis = (await invoke("get_images", {})) as Array<Asset>;
       dispatch(addAssets({ assets: databis, type: "images" }));
+      let dataMusics = (await invoke("get_musics", {})) as Array<Asset>;
+      dispatch(addAssets({ assets: dataMusics, type: "musics" }));
     } catch (error) {
       const game = await fetch("./data.json").then(d => d.json())
       dispatch(loadGame({ game }))
 
       const assetsNames = await fetch("./assets/images/data.json").then(d => d.json())
-      const assets: Array<Asset> = assetsNames.map((assetName: string) => ({ name : assetName, content: `../assets/images/${assetName}`}))
+      const assets: Array<Asset> = assetsNames.map((assetName: string) => ({ name: assetName, content: `../assets/images/${assetName}` }))
       dispatch(addAssets({ assets: assets, type: "images" }));
+
+
+      const musicsNames = await fetch("./assets/musics/data.json").then(d => d.json())
+      const musics: Array<Asset> = musicsNames.map((assetName: string) => ({ name: assetName, content: `../assets/musics/${assetName}` }))
+      dispatch(addAssets({ assets: musics, type: "musics" }));
+
       dispatch(loadGame({ game }))
     }
   }
@@ -54,6 +62,7 @@ export default function PlayerMenu() {
             background-color: ${game.format.page}
           `}
       >
+        <h1>{game.settings.gameTitle}</h1>
         <StyledButton
           type="button"
           color={game.format.btnColor}
@@ -79,7 +88,7 @@ export default function PlayerMenu() {
           onClick={() => {
             try {
               invoke('quit', {});
-            } catch (error) {}
+            } catch (error) { }
           }}
         >
           {game.settings.texts?.quit ?? initialTexts.quit}

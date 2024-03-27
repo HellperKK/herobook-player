@@ -1,6 +1,6 @@
 import Box from "@mui/system/Box";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ejs from "ejs";
 
@@ -16,10 +16,16 @@ import StyledImg from "../components/game/StyledImg";
 import { invoke } from "@tauri-apps/api";
 import { changeState } from "../store/playSlice";
 
+interface AudioInfo {
+  name: string,
+  audio: HTMLAudioElement,
+}
+
 export default function Player() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { game, assets } = useSelector((state: RootState) => state.game);
+  const [audioInfo, setAudioInfo] = useState<AudioInfo | null>(null);
 
   const { id } = useParams();
 
@@ -30,6 +36,18 @@ export default function Player() {
     return <p>No page</p>
   }
 
+  const audioAsset = assets.musics.find(music => music.name === selectedPage.audio)
+  console.log(audioAsset, assets);
+  let audio: HTMLAudioElement | null = null;
+  if (audioAsset && ((audioInfo && audioInfo.name !== audioAsset.name) || !audioInfo)) {
+    if (audioInfo) {
+      audioInfo.audio.pause();
+    }
+    audio = new Audio(audioAsset.content);
+    audio.loop = true;
+    audio.play();
+  }
+
   const jinter = new Jinter(selectedPage.script ?? "")
   jinter.scope.set("$state", gameState.$state);
   jinter.interpret();
@@ -38,6 +56,12 @@ export default function Player() {
 
   const nextPage = (id: number) => {
     if (id === 0) {
+      if (audio) {
+        audio.pause()
+      }
+      if (audioInfo) {
+        audioInfo.audio.pause();
+      }
       navigate("/")
     }
     else {
@@ -53,6 +77,9 @@ export default function Player() {
         key={`poll_${index + 42}`}
         onClick={() => {
           nextPage(choice.pageId);
+          if (audio) {
+            setAudioInfo({ name: audioAsset!.name, audio })
+          }
         }}
         color={selectedPage.format.btnColor ?? game.format.btnColor}
         dangerouslySetInnerHTML={{
@@ -90,6 +117,12 @@ export default function Player() {
           <StyledButton
             type="button"
             onClick={() => {
+              if (audio) {
+                audio.pause()
+              }
+              if (audioInfo) {
+                audioInfo.audio.pause();
+              }
               navigate("/")
             }}
             color={selectedPage.format.btnColor ?? game.format.btnColor}
