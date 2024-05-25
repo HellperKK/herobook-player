@@ -48,6 +48,14 @@ export default function Player() {
     audio.play();
   }
 
+  const soundAsset = assets.sounds.find(sound => sound.name === selectedPage.sound)
+
+  if (soundAsset) {
+    audio = new Audio(soundAsset.content);
+    audio.loop = false;
+    audio.play();
+  }
+
   const jinter = new Jinter(selectedPage.script ?? "")
   jinter.scope.set("$state", gameState.$state);
   jinter.interpret();

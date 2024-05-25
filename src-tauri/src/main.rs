@@ -116,6 +116,32 @@ fn get_musics() -> Vec<Asset> {
 }
 
 #[tauri::command]
+fn get_sounds() -> Vec<Asset> {
+    match fs::read_dir("./assets/sounds") {
+        Err(_) => Vec::<Asset>::new(),
+
+        Ok(entries) => entries
+            .filter_map(|e| e.ok())
+            .map(|e| {
+                let path = e.path();
+                let name = path.to_string_lossy().into_owned();
+                if let Ok(content) = fs::read(&name) {
+                    let base64_content = general_purpose::STANDARD.encode(content);
+                    let formated = format!("data:audio/ogg;base64,{}", base64_content);
+                    Asset {
+                        name: path.file_name().expect("should be a file name").to_string_lossy().into_owned(),
+                        content: formated.to_string()
+                    }
+                } else {
+                    println!("could not open {}", name);
+                    panic!("missing image !")
+                }
+            })
+            .collect::<Vec<_>>(),
+    }
+}
+
+#[tauri::command]
 fn quit() -> String {
     println!("quiting");
     std::process::exit(0);
@@ -124,7 +150,7 @@ fn quit() -> String {
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            load, load_image, get_saves, save, load_save, get_images, quit, get_musics
+            load, load_image, get_saves, save, load_save, get_images, quit, get_musics, get_sounds
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

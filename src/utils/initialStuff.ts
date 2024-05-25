@@ -27,6 +27,7 @@ interface Page {
   format: Format;
   image: string;
   audio?: string;
+  sound?: string;
   category?: string;
   script?: string;
 }

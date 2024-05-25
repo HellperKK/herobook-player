@@ -29,6 +29,8 @@ export default function PlayerMenu() {
       dispatch(addAssets({ assets: databis, type: "images" }));
       let dataMusics = (await invoke("get_musics", {})) as Array<Asset>;
       dispatch(addAssets({ assets: dataMusics, type: "musics" }));
+      let dataSounds = (await invoke("get_sounds", {})) as Array<Asset>;
+      dispatch(addAssets({ assets: dataSounds, type: "sounds" }));
     } catch (error) {
       const game = await fetch("./data.json").then(d => d.json())
       dispatch(loadGame({ game }))
@@ -41,6 +43,10 @@ export default function PlayerMenu() {
       const musicsNames = await fetch("./assets/musics/data.json").then(d => d.json())
       const musics: Array<Asset> = musicsNames.map((assetName: string) => ({ name: assetName, content: `../assets/musics/${assetName}` }))
       dispatch(addAssets({ assets: musics, type: "musics" }));
+
+      const soundsNames = await fetch("./assets/sounds/data.json").then(d => d.json())
+      const sounds: Array<Asset> = soundsNames.map((assetName: string) => ({ name: assetName, content: `../assets/sounds/${assetName}` }))
+      dispatch(addAssets({ assets: sounds, type: "sounds" }));
 
       dispatch(loadGame({ game }))
     }
