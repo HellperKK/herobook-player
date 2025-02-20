@@ -2,7 +2,6 @@ import ReactDOM from "react-dom/client";
 
 import { store } from "./store/store";
 import { Provider } from "react-redux";
-import GameViewer from "./GameViewer";
 import {
   Route,
   HashRouter,
@@ -10,6 +9,7 @@ import {
 } from "react-router-dom";
 import PlayerMenu from "./pages/PlayerMenu";
 import Player from "./pages/Player";
+import "./App.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
